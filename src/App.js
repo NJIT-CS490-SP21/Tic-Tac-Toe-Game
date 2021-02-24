@@ -1,20 +1,22 @@
 import { useState, useRef, useEffect } from 'react';
 import io from 'socket.io-client';
+import './Board.css';
 
 const socket = io(); // Connects to socket connection
 
 function App() {
   const [myBoard, setBoard] = useState(Array(9).fill("O"));
   
-  function onClickSquare(index){
+  function onClickSquare({index}){
+    //const newBoard = [...myBoard];
     const newBoard = myBoard.slice();
     newBoard[index] = 'X';
-    setBoard((prev => {[newBoard]});
-    socket.emit('click', { index: index });
+    setBoard(prevBoard => newBoard);
+    socket.emit('tic', { index: index, myBoard: myBoard });
   }
   
   function Square({value, index}){
-    return <button class="square" onClick={ () => onClickSquare({index})}>
+    return <button class="box" onClick={ () => onClickSquare({index})}>
           {value}
       </button>;
   }
@@ -22,25 +24,20 @@ function App() {
   useEffect(() => {
     // Listening for a chat event emitted by the server. If received, we
     // run the code in the function that is passed in as the second arg
-    socket.on('click', (data) => {
+    socket.on('tic', (data) => {
       console.log('User input received!');
       console.log(data);
       // If the server sends a message (on behalf of another client), then we
       // add it to the list of messages to render it on the UI.
-      const newBoard = myBoard.slice();
-      newBoard[data] = 'X';
-      setBoard(newBoard);
+      const newBoard = data.myBoard.slice();
+      newBoard[data.index] = 'X';
+      setBoard(prevBoard => newBoard);
     });
   }, []);
 
   return (
       <div class="board">
-      <h1>My Tic Tac Toe Board</h1>
-      <h2>{myBoard}</h2>
-
-        <div class ="box">
-          {myBoard.map((value, index) => <Square value={value} index={index} />)}
-        </div>
+        {myBoard.map((value, index) => <Square value={value} index={index} />)}
       </div>
   );
 }
