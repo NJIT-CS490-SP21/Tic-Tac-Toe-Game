@@ -7,6 +7,8 @@ app = Flask(__name__, static_folder='./build/static')
 
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
+users = []
+
 socketio = SocketIO(
     app,
     cors_allowed_origins="*",
@@ -32,11 +34,20 @@ def on_disconnect():
 # When a client emits the event 'chat' to the server, this function is run
 # 'chat' is a custom event name that we just decided
 @socketio.on('tic')
-def on_chat(data): # data is whatever arg you pass in your emit call on client
+def on_click(data): # data is whatever arg you pass in your emit call on client
     print(data)
     # This emits the 'chat' event from the server to all clients except for
     # the client that emmitted the event that triggered this function
     socketio.emit('tic',  data, broadcast=True, include_self=False)
+
+@socketio.on('logging')
+def logging_in(data): # data is whatever arg you pass in your emit call on client
+    # This emits the 'chat' event from the server to all clients except for
+    # the client that emmitted the event that triggered this function
+    users.append(data['userName'])
+    print(users)
+    socketio.emit('logging', users, broadcast=True, include_self=False)
+
 
 # Note that we don't call app.run anymore. We call socketio.run with app arg
 socketio.run(
