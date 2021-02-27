@@ -11,7 +11,7 @@ export function Board(){
 
   const [myBoard, setBoard] = useState(Array(9).fill(null));
   const [ isX, setTurn] = useState(true);
-  let status = 'Next Player: ' + (isX ? 'X': 'O');
+  const winner = calculateWinner(myBoard);
   
   function onClickSquare(index){
     const newBoard = myBoard.slice();
@@ -24,6 +24,41 @@ export function Board(){
   
   function renderSquare(index){
     return <Square value={myBoard[index]} onClick={onClickSquare} index={index}/>
+  }
+  
+  function getStatus(){
+    if(winner){ return "Winner: " + winner;}
+    else if(isBoardFull(myBoard)) { return "Draw";}
+    else{ return "Next Player: " + (isX ? "X": "O");}
+  }
+  
+  function isBoardFull(board){
+    for(let i=0; i< 9; i++){
+      if(board[i] == null){
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  function calculateWinner(myBoard) {
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+    for (let i = 0; i < lines.length; i++) {
+      const [a, b, c] = lines[i];
+      if (myBoard[a] && myBoard[a] === myBoard[b] && myBoard[a] === myBoard[c]) {
+        return myBoard[a];
+      }
+    }
+    return null;
   }
 
   useEffect(() => {
@@ -39,7 +74,7 @@ export function Board(){
     
   return (
     <div>
-      <h2>{status}</h2>
+      <h2>{getStatus()}</h2>
       <div class="board">
         {renderSquare(0)}
         {renderSquare(1)}
