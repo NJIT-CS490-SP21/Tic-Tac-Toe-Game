@@ -1,15 +1,18 @@
 import React from 'react';
 import io from 'socket.io-client';
 import { Square } from './Square.js';
+import { LogIn } from './LogIn.js';
 import { useState, useRef, useEffect } from 'react';
 
 const socket = io(); // Connects to socket connection
+export default socket;
 
 export function Board(){
   
   const [myBoard, setBoard] = useState(Array(9).fill(null));
   const [ isX, setTurn] = useState(true);
   let status = 'Next Player: ' + (isX ? 'X': 'O');
+  const [isLoggedIn, setLogIn] = useState(false); 
   
   function onClickSquare(index){
     const newBoard = myBoard.slice();
@@ -21,6 +24,26 @@ export function Board(){
   
   function renderSquare(index){
     return <Square value={myBoard[index]} onClick={onClickSquare} index={index}/>
+  }
+  
+  function renderBoard(){
+    if(isLoggedIn){
+    return (
+      <div>
+        <h2>{status}</h2>
+        <div class="board">
+            {renderSquare(0)}
+            {renderSquare(1)}
+            {renderSquare(2)}
+            {renderSquare(3)}
+            {renderSquare(4)}        
+            {renderSquare(5)}
+            {renderSquare(6)}
+            {renderSquare(7)}
+            {renderSquare(8)}
+        </div>
+      </div>
+    );}
   }
   
   function calculateWinner({squares}) {
@@ -54,20 +77,18 @@ export function Board(){
     });
   }, []);
   
+    useEffect(() => {
+      socket.on('logging', (data) => {
+        console.log('User login received!');
+        console.log(data.userName);
+        setLogIn(true);
+        console.log("i logged in")
+      });
+    }, []);
+    
   return (
     <div>
-      <h2>{status}</h2>
-      <div class="board">
-          {renderSquare(0)}
-          {renderSquare(1)}
-          {renderSquare(2)}
-          {renderSquare(3)}
-          {renderSquare(4)}        
-          {renderSquare(5)}
-          {renderSquare(6)}
-          {renderSquare(7)}
-          {renderSquare(8)}
-      </div>
+      {renderBoard()}
     </div>
   );
 }

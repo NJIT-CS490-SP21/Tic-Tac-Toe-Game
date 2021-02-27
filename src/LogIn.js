@@ -1,14 +1,16 @@
 import React from 'react';
 import { useState, useRef } from 'react';
+import socket from "./Board.js";
 
 export function LogIn(){
+  
     const [isLoggedIn, setLogIn] = useState(false);
     const inputRef = useRef(null);
     
-    function returnUser(){
+    function userLogIn(){
         setLogIn(true);
         const userName = inputRef.current.value;
-        return console.log("im here");
+        socket.emit('logging', { userName: userName });
     }
     
     function logInScreen(){
@@ -17,7 +19,7 @@ export function LogIn(){
             <div>
               <h1>Log In</h1>
               <input ref={inputRef} type='text' />
-              <button onClick={returnUser}>Log In</button>
+              <button onClick={userLogIn}>Log In</button>
             </div>
             )}
         else{return null}

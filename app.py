@@ -35,7 +35,6 @@ def on_disconnect():
 # 'chat' is a custom event name that we just decided
 @socketio.on('tic')
 def on_click(data): # data is whatever arg you pass in your emit call on client
-    print(data)
     # This emits the 'chat' event from the server to all clients except for
     # the client that emmitted the event that triggered this function
     socketio.emit('tic',  data, broadcast=True, include_self=False)
@@ -45,8 +44,7 @@ def logging_in(data): # data is whatever arg you pass in your emit call on clien
     # This emits the 'chat' event from the server to all clients except for
     # the client that emmitted the event that triggered this function
     users.append(data['userName'])
-    print(users)
-    socketio.emit('logging', users, broadcast=True, include_self=False)
+    socketio.emit('logging', {userName: data['userName'], users: users}, broadcast=True, include_self=False)
 
 
 # Note that we don't call app.run anymore. We call socketio.run with app arg
