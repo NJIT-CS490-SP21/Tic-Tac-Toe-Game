@@ -1,13 +1,12 @@
 import os
-from flask import Flask, send_from_directory, json, session
+from flask import Flask, send_from_directory, json, session, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
 app = Flask(__name__, static_folder='./build/static')
-
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
-
 users = []
+server_ids = []
 
 socketio = SocketIO(
     app,
@@ -24,8 +23,10 @@ def index(filename):
 # When a client connects from this Socket connection, this function is run
 @socketio.on('connect')
 def on_connect():
+    #if request.sid not in server_ids.keys():
+    #    server_ids[request.sid] = {sid: request.sid}
     print('User connected!')
-
+    
 # When a client disconnects from this Socket connection, this function is run
 @socketio.on('disconnect')
 def on_disconnect():
@@ -44,8 +45,8 @@ def logging_in(data): # data is whatever arg you pass in your emit call on clien
     # This emits the 'chat' event from the server to all clients except for
     # the client that emmitted the event that triggered this function
     users.append(data['userName'])
-    socketio.emit('logging', {userName: data['userName'], users: users}, broadcast=True, include_self=False)
-
+    print(data)
+    socketio.emit('logging', data, room=request.sid)
 
 # Note that we don't call app.run anymore. We call socketio.run with app arg
 socketio.run(
