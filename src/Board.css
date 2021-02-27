@@ -6,6 +6,6 @@
   grid-template-rows: repeat(3, 1fr); /* Total vertical space broken into 3 rows */
 }
 
-.box {
+.square {
   border: 1px solid black; /* Shows the lines in the CSS grid */
 }
