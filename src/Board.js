@@ -13,6 +13,7 @@ export function Board(user){
   const [isX, setTurn] = useState(true);
   const winner = calculateWinner(myBoard);
   const isSpect = user.isSpectator;
+  const userName = user.userName;
 
   function onClickSquare(index){
     if(!winner && !myBoard[index] && !isSpect){
@@ -29,7 +30,7 @@ export function Board(user){
   }
   
   function getStatus(){
-    if(winner){ return "Winner: " + winner;}
+    if(winner){ return "Winner: " + userName;}
     else if(isBoardFull(myBoard)) { return "Draw";}
     else{ return "Next Player: " + (isX ? "X": "O");}
   }
@@ -64,8 +65,10 @@ export function Board(user){
   }
   
   function resetBoard(){
-    const emptyBoard = Array(9).fill(null);
-    socket.emit('reset', { emptyBoard:emptyBoard, isX:true });
+    if(!isSpect){
+      const emptyBoard = Array(9).fill(null);
+      socket.emit('reset', { emptyBoard:emptyBoard, isX:true });
+    }
   }
 
   useEffect(() => {
@@ -88,7 +91,7 @@ export function Board(user){
     
   return (
     <div>
-      <h2>{getStatus()}</h2>
+      <h3>{getStatus()}</h3>
       <div class="board">
         {renderSquare(0)}
         {renderSquare(1)}

@@ -11,6 +11,7 @@ function App() {
   const [userList, setUsers] = useState([]);
   const [user, setUserName] = useState("");
   let isSpect = isSpectator();
+  let canStartGame = (userList.length >= 2) ? true: false;
 
   function renderLogIn(){
     if(!isLoggedIn) {return <LogIn/>;}
@@ -18,11 +19,11 @@ function App() {
   }
   
   function renderBoard(){
-    if(isLoggedIn) {
+    if(isLoggedIn && canStartGame) {
       return (
         <div>
           <h2>I am {user}</h2>
-          <Board isSpectator={isSpect} />;
+          <Board isSpectator={isSpect} userName={user} />;
         </div>
       )
       
@@ -33,21 +34,29 @@ function App() {
   function renderUserList(){
     if(isLoggedIn){
       let length = userList.length;
-      console.log(userList);
-      let str = "Player X: " + userList[0] + " Player: O " + userList[1] + " Spectators: ";
+      let playerX = userList[0];
+      let playerO = userList[1];
+      let spectators;
       if(length > 2){
-        for(var i=2; i<length;i++){ str = str + userList[i] + " "; } 
+        for(var i=2; i<length;i++){ spectators += userList[i] + '\n' ; } 
       }
 
-      return str;
+      return (
+        <div>
+          <h3>Player X:</h3>
+          {playerX}
+          <h3>Player O:</h3>
+          {playerO}
+          <h3>Spectators:</h3>
+          {spectators}
+        </div>
+      )
     }
   }
   
   function isSpectator(){
 
     let x = userList.indexOf(user);
-    console.log(userList);
-    console.log(x);
     if(x>1) { return true;}
     return false;
   }
@@ -71,9 +80,9 @@ function App() {
   }, []);
   
     return (
-      <div>
-          {renderLogIn()}
-          {renderUserList()}
+      <div class="container">
+        {renderLogIn()}
+        {renderUserList()}
         <div class="game">
           {renderBoard()}
         </div>
