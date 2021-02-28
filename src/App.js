@@ -8,7 +8,9 @@ import socket from "./Board.js";
 function App() {
   
   const [isLoggedIn, setLogIn] = useState(false);
-  const [userList, setUser] = useState([]);
+  const [userList, setUsers] = useState([]);
+  const [user, setUserName] = useState("");
+  let isSpect = isSpectator();
 
   function renderLogIn(){
     if(!isLoggedIn) {return <LogIn/>;}
@@ -16,7 +18,15 @@ function App() {
   }
   
   function renderBoard(){
-    if(isLoggedIn) {return <Board/>;}
+    if(isLoggedIn) {
+      return (
+        <div>
+          <h2>I am {user}</h2>
+          <Board isSpectator={isSpect} />;
+        </div>
+      )
+      
+    }
     return;
   }
   
@@ -33,6 +43,15 @@ function App() {
     }
   }
   
+  function isSpectator(){
+
+    let x = userList.indexOf(user);
+    console.log(userList);
+    console.log(x);
+    if(x>1) { return true;}
+    return false;
+  }
+  
   useEffect(() => {
     socket.on('logging', (data) => {
       setLogIn(true);
@@ -41,11 +60,16 @@ function App() {
   
   useEffect(() => {
     socket.on('userlist', (data) => {
-      setUser(data);
+      setUsers(data);
     });
   }, []);
   
-
+  useEffect(() => {
+    socket.on('username', (data) => {
+      setUserName(data);
+    });
+  }, []);
+  
     return (
       <div>
           {renderLogIn()}

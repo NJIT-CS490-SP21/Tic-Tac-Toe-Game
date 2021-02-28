@@ -7,19 +7,22 @@ import { useState, useRef, useEffect } from 'react';
 const socket = io(); // Connects to socket connection
 export default socket;
 
-export function Board(){
+export function Board(user){
 
   const [myBoard, setBoard] = useState(Array(9).fill(null));
-  const [ isX, setTurn] = useState(true);
+  const [isX, setTurn] = useState(true);
   const winner = calculateWinner(myBoard);
+  const isSpect = user.isSpectator;
+  console.log(isSpect);
   
   function onClickSquare(index){
-    const newBoard = myBoard.slice();
-    if(myBoard[index]){ return; }
-    newBoard[index] = isX ? 'X':'O'; //check whose turn it is
-    setBoard(newBoard);
-    setTurn(!isX);
-    socket.emit('tic', { index: index, myBoard: myBoard, isX: isX });
+    if(!winner && !myBoard[index] && !isSpect){
+      const newBoard = myBoard.slice();
+      newBoard[index] = isX ? 'X':'O'; //check whose turn it is
+      setBoard(newBoard);
+      setTurn(!isX);
+      socket.emit('tic', { index: index, myBoard: myBoard, isX: isX });
+    }
   }
   
   function renderSquare(index){

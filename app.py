@@ -32,7 +32,10 @@ def on_connect():
 def on_disconnect():
     print('User disconnected!')
     if request.sid in userIDs.keys():
-        del users[request.sid]
+        userToDelete = userIDs[str(request.sid)]
+        del userIDs[str(request.sid)]
+        users.remove(userToDelete)
+    socketio.emit('userlist', users , broadcast=True, include_self=True)
 
 # When a client emits the event 'chat' to the server, this function is run
 # 'chat' is a custom event name that we just decided
@@ -51,6 +54,7 @@ def logging_in(data): # data is whatever arg you pass in your emit call on clien
         userIDs[str(request.sid)] = name
         users.append(name)
     socketio.emit('logging', users, room=request.sid)
+    socketio.emit('username', name, room=request.sid)
     socketio.emit('userlist', users , broadcast=True, include_self=True)
 
 # Note that we don't call app.run anymore. We call socketio.run with app arg
