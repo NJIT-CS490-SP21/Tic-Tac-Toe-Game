@@ -13,8 +13,7 @@ export function Board(user){
   const [isX, setTurn] = useState(true);
   const winner = calculateWinner(myBoard);
   const isSpect = user.isSpectator;
-  console.log(isSpect);
-  
+
   function onClickSquare(index){
     if(!winner && !myBoard[index] && !isSpect){
       const newBoard = myBoard.slice();
@@ -63,17 +62,29 @@ export function Board(user){
     }
     return null;
   }
+  
+  function resetBoard(){
+    const emptyBoard = Array(9).fill(null);
+    socket.emit('reset', { emptyBoard:emptyBoard, isX:true });
+  }
 
   useEffect(() => {
-  socket.on('tic', (data) => {
-    console.log('Square click received!');
-    console.log(data.isX);
-    const newBoard = data.myBoard.slice();
-    newBoard[data.index] = data.isX ? 'X':'O'; //check whose turn it is
-    setBoard(newBoard);
-    setTurn(!data.isX);
-  });
-}, []);
+    socket.on('tic', (data) => {
+      console.log('Square click received!');
+      console.log(data.isX);
+      const newBoard = data.myBoard.slice();
+      newBoard[data.index] = data.isX ? 'X':'O'; //check whose turn it is
+      setBoard(newBoard);
+      setTurn(!data.isX);
+    });
+  }, []);
+
+  useEffect(() => {
+    socket.on('reset', (data) => {
+      setTurn(data.isX);
+      setBoard(data.emptyBoard);
+    });
+  }, []);
     
   return (
     <div>
@@ -89,6 +100,7 @@ export function Board(user){
         {renderSquare(7)}
         {renderSquare(8)}
       </div>
+      <button onClick={resetBoard}>Reset Board</button>
     </div>
 
   );
