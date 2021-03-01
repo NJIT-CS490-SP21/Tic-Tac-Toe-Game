@@ -12,50 +12,48 @@ function App() {
   const [user, setUserName] = useState("");
   let isSpect = isSpectator();
   let canStartGame = (userList.length >= 2) ? true: false;
+  let playerX, playerO, whichPlayer;
 
   function renderLogIn(){
     if(!isLoggedIn) {return <LogIn/>;}
-    return;
+    return
   }
   
   function renderBoard(){
     if(isLoggedIn && canStartGame) {
+      if(user === playerX){ whichPlayer = true; }
+      if(user === playerO){ whichPlayer = false;  }
       return (
         <div>
-          <h2>I am {user}</h2>
-          <Board isSpectator={isSpect} userName={user} />;
+          <Board isSpectator={isSpect} userName={user} whichPlayer={whichPlayer}/>;
         </div>
       )
-      
     }
-    return;
+    return
   }
   
   function renderUserList(){
     if(isLoggedIn){
       let length = userList.length;
-      let playerX = userList[0];
-      let playerO = userList[1];
-      let spectators;
+      playerX = userList[0];
+      playerO = userList[1];
+      let spectators = "";
       if(length > 2){
-        for(var i=2; i<length;i++){ spectators += userList[i] + '\n' ; } 
+        for(var i=2; i<length;i++){ spectators = spectators + userList[i] + '\r' ; } 
       }
 
       return (
-        <div>
-          <h3>Player X:</h3>
-          {playerX}
-          <h3>Player O:</h3>
-          {playerO}
-          <h3>Spectators:</h3>
-          {spectators}
+        <div class="users">
+          <h1>{user}'s Tic Tac Toe</h1>
+          <h2>Player X: {playerX}</h2>
+          <h2>Player O: {playerO}</h2>
+          <h3>Spectators: {spectators}</h3>
         </div>
       )
     }
   }
   
   function isSpectator(){
-
     let x = userList.indexOf(user);
     if(x>1) { return true;}
     return false;
@@ -83,12 +81,9 @@ function App() {
       <div class="container">
         {renderLogIn()}
         {renderUserList()}
-        <div class="game">
-          {renderBoard()}
-        </div>
+        {renderBoard()}
       </div>
-    )
-  
+    );
 }
 
 export default App;

@@ -1,16 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+
 .board {
-	width: 300px; /* Total horizontal dimensions */
-	height: 300px; /* Total vertical dimensions */
-	display: grid; /* Enables CSS Grid */ 
-	grid-template-columns: repeat(3, 1fr); /* Total horizontal space broken into 3 columns */
-  grid-template-rows: repeat(3, 1fr); /* Total vertical space broken into 3 rows */
-  margin: auto;
+    width: 300px; /* Total horizontal dimensions */
+    height: 300px; /* Total vertical dimensions */
+    display: grid; /* Enables CSS Grid */ 
+    grid-template-columns: repeat(3, 1fr); /* Total horizontal space broken into 3 columns */
+    grid-template-rows: repeat(3, 1fr); /* Total vertical space broken into 3 rows */
+    margin: auto;
 }
 
 .square {
-  border: 1px solid black; /* Shows the lines in the CSS grid */
+  border: 1px solid white; /* Shows the lines in the CSS grid */
+  background: #90a3b0;
+  color: white;
+  font-size: 25px;
 }
 
-.container{
+.container {
 	text-align:center;
+	color: #242526;
+	font-family: 'DotGothic16', sans-serif;
+}
+
+.users > h3 {
+	font-size: 15px;
+	margin: 0;
+	padding-bottom: 5px;
+}
+
+.login {
+	transition-duration: 0.4s;
+	padding-top: 35px;
+}
+
+.login > h2 {
+	font-weight: bold;
+	margin: 0;
+}
+
+.login > button {
+	margin:5px 0px 0px 5px;
+	background-color: white;
+  color: black;
+  border: 2px solid #555555;
+  font-family: 'DotGothic16', sans-serif;
+  font-size: 11px;
+}
+
+.login > button:hover {
+  background-color: #555555; /* Green */
+  color: white;
+}
+
+.reset {
+	background-color: white;
+  color: black;
+  border: 2px solid #555555;
+  font-size: 18px;
+  font-family: 'DotGothic16', sans-serif;
+}
+
+.reset:hover {
+  background-color: #555555; /* Green */
+  color: white;
 }

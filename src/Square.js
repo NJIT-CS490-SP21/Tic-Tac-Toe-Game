@@ -4,5 +4,5 @@ import React from 'react';
 //need to control the onClick feature conditionally, we pass it as props
 export function Square(props){
   return <button class="square" onClick={() => {props.onClick(props.index)}}> {props.value}
-    </button>;
+    </button>
 }

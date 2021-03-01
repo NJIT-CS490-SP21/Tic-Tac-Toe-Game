@@ -1,8 +1,7 @@
 import React from 'react';
 import io from 'socket.io-client';
 import { Square } from './Square.js';
-import { LogIn } from './LogIn.js';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const socket = io(); // Connects to socket connection
 export default socket;
@@ -14,9 +13,10 @@ export function Board(user){
   const winner = calculateWinner(myBoard);
   const isSpect = user.isSpectator;
   const userName = user.userName;
-
+  const whichPlayer = user.whichPlayer;
+  
   function onClickSquare(index){
-    if(!winner && !myBoard[index] && !isSpect){
+    if(!winner && !myBoard[index] && !isSpect && (whichPlayer == isX)){
       const newBoard = myBoard.slice();
       newBoard[index] = isX ? 'X':'O'; //check whose turn it is
       setBoard(newBoard);
@@ -26,13 +26,13 @@ export function Board(user){
   }
   
   function renderSquare(index){
-    return <Square value={myBoard[index]} onClick={onClickSquare} index={index}/>
+    return <Square value={myBoard[index]} onClick={onClickSquare} index={index}/>;
   }
   
   function getStatus(){
-    if(winner){ return "Winner: " + userName;}
-    else if(isBoardFull(myBoard)) { return "Draw";}
-    else{ return "Next Player: " + (isX ? "X": "O");}
+    if(winner){ return ("Winner: " + userName); }
+    else if(isBoardFull(myBoard)) { return ("Draw");}
+    else{ return ("Next Player: " + (isX ? "X" : "O"));}
   }
   
   function isBoardFull(board){
@@ -65,7 +65,7 @@ export function Board(user){
   }
   
   function resetBoard(){
-    if(!isSpect){
+    if(!isSpect && (winner || isBoardFull(myBoard))){
       const emptyBoard = Array(9).fill(null);
       socket.emit('reset', { emptyBoard:emptyBoard, isX:true });
     }
@@ -73,8 +73,6 @@ export function Board(user){
 
   useEffect(() => {
     socket.on('tic', (data) => {
-      console.log('Square click received!');
-      console.log(data.isX);
       const newBoard = data.myBoard.slice();
       newBoard[data.index] = data.isX ? 'X':'O'; //check whose turn it is
       setBoard(newBoard);
@@ -91,7 +89,6 @@ export function Board(user){
     
   return (
     <div>
-      <h3>{getStatus()}</h3>
       <div class="board">
         {renderSquare(0)}
         {renderSquare(1)}
@@ -103,7 +100,8 @@ export function Board(user){
         {renderSquare(7)}
         {renderSquare(8)}
       </div>
-      <button onClick={resetBoard}>Reset Board</button>
+      <h2>{getStatus()}</h2>
+      <button class="reset" onClick={resetBoard}>Reset Board</button>
     </div>
 
   );

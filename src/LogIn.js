@@ -7,18 +7,20 @@ export function LogIn(){
     const inputRef = useRef(null);
     
     function userLogIn(){
+      if(inputRef != null){
         const userName = inputRef.current.value;
         socket.emit('logging', { userName: userName });
+      }
     }
     
     function logInScreen(){
       return( 
-        <div>
-          <h1>Log In</h1>
+        <div class='login'>
+          <h2>Log In</h2>
           <input ref={inputRef} type='text' />
           <button onClick={userLogIn}>Log In</button>
         </div>
-        )
+        );
     }
   
   return logInScreen();
