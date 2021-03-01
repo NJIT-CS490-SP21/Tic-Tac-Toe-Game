@@ -25,7 +25,7 @@ function App() {
       if(user === playerO){ whichPlayer = false;  }
       return (
         <div>
-          <Board isSpectator={isSpect} userName={user} whichPlayer={whichPlayer}/>;
+          <Board isSpectator={isSpect} userName={user} whichPlayer={whichPlayer} playerX={playerX} playerO={playerO}/>;
         </div>
       )
     }

@@ -14,6 +14,9 @@ export function Board(user){
   const isSpect = user.isSpectator;
   const userName = user.userName;
   const whichPlayer = user.whichPlayer;
+  const playerX = user.playerX;
+  const playerO = user.playerO;
+  let winnerName;
   
   function onClickSquare(index){
     if(!winner && !myBoard[index] && !isSpect && (whichPlayer == isX)){
@@ -30,7 +33,11 @@ export function Board(user){
   }
   
   function getStatus(){
-    if(winner){ return ("Winner: " + userName); }
+    if(winner){ 
+      if(!isX) { winnerName = playerX; }
+      else { winnerName = playerO; }
+      return ("Winner: " + winnerName); 
+    }
     else if(isBoardFull(myBoard)) { return ("Draw");}
     else{ return ("Next Player: " + (isX ? "X" : "O"));}
   }
