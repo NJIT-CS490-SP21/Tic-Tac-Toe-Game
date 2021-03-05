@@ -1,4 +1,3 @@
-import React from 'react';
 import { useRef } from 'react';
 import socket from "./Board.js";
 
@@ -7,10 +6,9 @@ export function LogIn(){
     const inputRef = useRef(null);
     
     function userLogIn(){
-      if(inputRef != null){
-        const userName = inputRef.current.value;
-        socket.emit('logging', { userName: userName });
-      }
+      const userName = inputRef.current.value;
+      if(userName === ""){ return;}
+      socket.emit('logging', { userName: userName });
     }
     
     function logInScreen(){

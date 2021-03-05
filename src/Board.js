@@ -85,15 +85,12 @@ export function Board(user){
       setBoard(newBoard);
       setTurn(!data.isX);
     });
-  }, []);
-
-  useEffect(() => {
     socket.on('reset', (data) => {
       setTurn(data.isX);
       setBoard(data.emptyBoard);
     });
   }, []);
-    
+  
   return (
     <div>
       <div class="board">

@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import React from 'react';
+import { useState, useEffect } from 'react';
 import { Board } from './Board.js';
 import { LogIn } from './LogIn.js';
-import './Board.css';
-import React from 'react';
 import socket from "./Board.js";
+import './Board.css';
 
 function App() {
   
@@ -63,19 +63,15 @@ function App() {
     socket.on('logging', (data) => {
       setLogIn(true);
     });
-  }, []);
-  
-  useEffect(() => {
     socket.on('userlist', (data) => {
       setUsers(data);
     });
-  }, []);
-  
-  useEffect(() => {
     socket.on('username', (data) => {
       setUserName(data);
     });
+    
   }, []);
+
   
     return (
       <div class="container">
