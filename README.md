@@ -12,7 +12,7 @@
 2. Run command in another terminal, `cd` into the project directory, and run `npm run start`
 3. Preview web page in browser '/'
 
-##Deploy to Heroku
+## Deploy to Heroku
 1. Run command in terminal to install Heroku CLI: npm install -g heroku
 2. Create an account on Heroku: https://signup.heroku.com/login
 3. Log in to Heroku in terminal: heroku login -i
