@@ -2,46 +2,39 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { Board } from './Board.js';
 import { LogIn } from './LogIn.js';
-import socket from "./Board.js";
 import './Board.css';
+import socket from "./Board.js";
 
 function App() {
   
   const [isLoggedIn, setLogIn] = useState(false);
-  const [userList, setUsers] = useState([]);
-  const [user, setUserName] = useState("");
-  let isSpect = isSpectator();
-  let canStartGame = (userList.length >= 2) ? true: false;
-  let playerX, playerO, whichPlayer;
+  const [myUserlist, setUserlist] = useState({});
+  const [user, setUser] = useState("");
+  let playerX, playerO, spectators;
 
   function renderLogIn(){
     if(!isLoggedIn) {return <LogIn/>;}
-    return
+    return;
   }
   
   function renderBoard(){
-    if(isLoggedIn && canStartGame) {
-      if(user === playerX){ whichPlayer = true; }
-      if(user === playerO){ whichPlayer = false;  }
+    if(isLoggedIn) {
       return (
         <div>
-          <Board isSpectator={isSpect} userName={user} whichPlayer={whichPlayer} playerX={playerX} playerO={playerO}/>;
+          <Board user={user} playerX={playerX} playerO={playerO} spectators={spectators} />
         </div>
-      )
+      );
     }
-    return
+    return;
   }
   
-  function renderUserList(){
+  function renderUserlist(){
     if(isLoggedIn){
-      let length = userList.length;
-      playerX = userList[0];
-      playerO = userList[1];
-      let spectators = "";
-      if(length > 2){
-        for(var i=2; i<length;i++){ spectators = spectators + userList[i] + '\r' ; } 
-      }
-
+      let lst="";
+      playerX = myUserlist["Player X"];
+      playerO = myUserlist["Player O"];
+      spectators = myUserlist["Spectators"];
+      
       return (
         <div class="users">
           <h1>{user}'s Tic Tac Toe</h1>
@@ -53,33 +46,40 @@ function App() {
     }
   }
   
-  function isSpectator(){
-    let x = userList.indexOf(user);
-    if(x>1) { return true;}
-    return false;
-  }
+  /*function renderLeaderboard(){
+    if(isLoggedIn){
+      return(
+        <div class="leaderboard">
+          <Leaderboard scores={userlist}/>
+        </div>);
+    }
+  }*/
   
   useEffect(() => {
     socket.on('logging', (data) => {
       setLogIn(true);
     });
+  }, []);
+  
+  useEffect(() => {
     socket.on('userlist', (data) => {
-      setUsers(data);
+      setUserlist(data);
     });
+  }, []);
+  
+  useEffect(() => {
     socket.on('username', (data) => {
-      setUserName(data);
+      setUser(data);
     });
-    
   }, []);
 
-  
-    return (
-      <div class="container">
-        {renderLogIn()}
-        {renderUserList()}
-        {renderBoard()}
-      </div>
-    );
+  return (
+    <div class="container">
+      {renderLogIn()}
+      {renderUserlist()}
+      {renderBoard()}
+    </div>
+  );
 }
 
 export default App;

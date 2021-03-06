@@ -6,9 +6,9 @@ export function LogIn(){
     const inputRef = useRef(null);
     
     function userLogIn(){
-      const userName = inputRef.current.value;
-      if(userName === ""){ return;}
-      socket.emit('logging', { userName: userName });
+      const username = inputRef.current.value;
+      if(username === ""){ return;}
+      socket.emit('logging', { username: username });
     }
     
     function logInScreen(){
