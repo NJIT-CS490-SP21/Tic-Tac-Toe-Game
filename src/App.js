@@ -4,6 +4,7 @@ import { Board } from './Board.js';
 import { LogIn } from './LogIn.js';
 import { Leaderboard } from './Leaderboard.js';
 import './Board.css';
+import './Leaderboard.css';
 import socket from "./Board.js";
 
 function App() {
@@ -13,20 +14,8 @@ function App() {
   const [userlist, setUserlist] = useState({"X":"", "O": "", "Spectators": []});
   const [scores, setScores] = useState([]);
   const [users, setUsers] = useState([]);
+  const [showScore, setShow] = useState([true]);
   let playerX, playerO, isSpect, spectators;
-  
-  console.log(users);
-  console.log(scores);
-  
-  const renderTable = scores.map((value, index) => {
-        const score =users[index];
-        return (
-            <tr key={index}>
-            <td>{value}</td>
-            <td>{score}</td>
-            </tr>
-        );
-    });
 
   function renderLogIn(){
     if(!isLoggedIn) {return <LogIn userlist={userlist} />;}
@@ -62,34 +51,31 @@ function App() {
     }
   }
   
+  
   function renderLeaderboard(){
     if(isLoggedIn){
-      return (
-                <div>
-                    <table>
-                        <thead key="leaderboard">
-                            <tr>
-                                <th>User</th>
-                                <th>Score</th>
-                            </tr>
-                        </thead>
-                        <tbody >
-                            {renderTable}
-                        </tbody>
-                    </table>
-                </div>
-            );
-    }
+      if(showScore){
+        return(
+          <div>
+            <Leaderboard scores={scores} users={users} user={user}/>
+          </div>);
+        }
+      }
   }
   
-  /*function renderLeaderboard(){
-    if(isLoggedIn){
-      return(
-        <div class="leaderboard">
-          <Leaderboard scores={scores} users={users}/>
-        </div>);
-    }
-  }*/
+  function leaderboard(){
+      if(isLoggedIn){
+        return(
+          <div>
+            <button class="clickleader" onClick={() => {onClickLeaderboard()}}>Show/Hide Leaderboard</button>
+          </div>
+        );
+      }
+  }
+  
+  function onClickLeaderboard(){
+    setShow(!showScore);
+  }
   
   useEffect(() => {
     socket.on('logging', (data) => {
@@ -115,6 +101,7 @@ function App() {
       {renderLogIn()}
       {renderUserlist()}
       {renderBoard()}
+      {leaderboard()}
       {renderLeaderboard()}
     </div>
   );

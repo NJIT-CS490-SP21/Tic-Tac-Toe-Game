@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+
+
+.clickleader {
+    background-color:white;
+    color: black;
+    border: 2px solid #555555;
+    font-size: 18px;
+    font-family: 'DotGothic16', sans-serif;
+    margin: 5px;
+
+}
+.clickleader:hover {
+    background-color: #555555; /* Green */
+    color: white; 
+}
+
+table, th, td{
+    border: 1px solid black;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+th {
+    background-color: #808080;
+}
+
+.curruser {
+    font-weight: bold;
+}

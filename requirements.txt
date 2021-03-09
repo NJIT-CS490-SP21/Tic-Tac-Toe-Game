@@ -2,3 +2,5 @@ Flask
 Flask-SocketIO
 Flask-Cors
 requests
+Flask-SQLAlchemy
+psycopg2

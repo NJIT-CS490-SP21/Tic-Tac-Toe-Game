@@ -47,6 +47,7 @@ def on_connect():
 def on_disconnect():
     print('User disconnected!')
 
+
 # When a client emits the event 'chat' to the server, this function is run
 # 'chat' is a custom event name that we just decided
 @socketio.on('tic')
@@ -61,24 +62,41 @@ def logging_in(data):
     name = data['username']
     userlist = data['userlist']
     
-    if len(userIDs) == 0:
-        db.session.query(models.Person).delete()
-        db.session.commit()
+    #if len(userIDs) == 0: #if server restarted, reload user data from database
+        #score_received = 0
+        #db.session.query(models.Person).delete()
+        #db.session.commit()
+
+    usernames.clear()
+    scores.clear()
+    print(usernames)
+    print(scores)
     
+    exists = db.session.query(models.Person).filter_by(username=name).first()
+    print(exists)
     #adding new user to DB if they are not there already
-    if str(request.sid) not in userIDs.keys():
+    if not exists:
         userIDs[str(request.sid)] = name
         new_user = models.Person(username=name, score=100)
         db.session.add(new_user)
         db.session.commit()
+        
+        #query new user's data
+        new_player = db.session.query(models.Person).filter_by(username=name).first()
+        new_player_name = new_player.username
+        new_player_score = new_player.score
+        print(new_player_name)
+        print(new_player_score)
 
-    new_player = db.session.query(models.Person).filter_by(username=name).first()
-    new_player_name = new_player.username
-    new_player_score = new_player.score
     
-    usernames.append(new_player_name)
-    scores.append(new_player_score)
+    all_scores = (db.session.query(models.Person)
+    .order_by(models.Person.score.desc())
+    )
     
+    for each in all_scores:
+        usernames.append(each.username)
+        scores.append(each.score)
+
     update_user = [usernames, scores]
 
     socketio.emit('update_score', update_user, broadcast=True, include_self=True)
