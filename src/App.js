@@ -2,26 +2,30 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { Board } from './Board.js';
 import { LogIn } from './LogIn.js';
+import { Leaderboard } from './Leaderboard.js';
 import './Board.css';
 import socket from "./Board.js";
 
 function App() {
   
   const [isLoggedIn, setLogIn] = useState(false);
-  const [myUserlist, setUserlist] = useState({});
   const [user, setUser] = useState("");
-  let playerX, playerO, spectators;
+  const [userlist, setUserlist] = useState({"X":"", "O": "", "Spectators": []});
+  const [scores, setScores] = useState([]);
+  const [users, setUsers] = useState([])
+  let playerX, playerO, isSpect, spectators;
 
   function renderLogIn(){
-    if(!isLoggedIn) {return <LogIn/>;}
+    if(!isLoggedIn) {return <LogIn userlist={userlist} />;}
     return;
   }
   
   function renderBoard(){
     if(isLoggedIn) {
+      isSpect=userlist["Spectators"].includes(user) ? true:false;
       return (
         <div>
-          <Board user={user} playerX={playerX} playerO={playerO} spectators={spectators} />
+          <Board user={user} playerX={playerX} playerO={playerO} isSpect={isSpect}/>
         </div>
       );
     }
@@ -30,11 +34,10 @@ function App() {
   
   function renderUserlist(){
     if(isLoggedIn){
-      let lst="";
-      playerX = myUserlist["Player X"];
-      playerO = myUserlist["Player O"];
-      spectators = myUserlist["Spectators"];
-      
+      playerX = userlist.X;
+      playerO = userlist.O;
+      spectators = userlist.Spectators;
+
       return (
         <div class="users">
           <h1>{user}'s Tic Tac Toe</h1>
@@ -42,42 +45,53 @@ function App() {
           <h2>Player O: {playerO}</h2>
           <h3>Spectators: {spectators}</h3>
         </div>
-      )
+      );
     }
   }
   
-  /*function renderLeaderboard(){
+  function renderLeaderboard(){
     if(isLoggedIn){
       return(
         <div class="leaderboard">
-          <Leaderboard scores={userlist}/>
+          <Leaderboard scores={scores} users={users}/>
         </div>);
     }
-  }*/
+  }
   
   useEffect(() => {
     socket.on('logging', (data) => {
       setLogIn(true);
     });
-  }, []);
-  
-  useEffect(() => {
+    
     socket.on('userlist', (data) => {
       setUserlist(data);
     });
-  }, []);
-  
-  useEffect(() => {
+    
     socket.on('username', (data) => {
       setUser(data);
     });
+    
+    socket.on('add_new_user', (data) => {
+      let copyScores = [...scores];
+      let copyUsers = [...users];
+      copyUsers.push(data[0]);
+      copyScores.push(data[1]);
+      setScores(copyScores);
+      setUsers(copyUsers);
+    });
+    
+    socket.on('update_score', (data) => {
+      setScores(data[0]);
+      setUsers(data[1]);
+    });
   }, []);
-
+  
   return (
     <div class="container">
       {renderLogIn()}
       {renderUserlist()}
       {renderBoard()}
+      {renderLeaderboard()}
     </div>
   );
 }

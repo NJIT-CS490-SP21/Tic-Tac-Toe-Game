@@ -14,10 +14,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 import models
+db.create_all()
 
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 userIDs = {}
-users = {"Player X": "", "Player O":"", "Spectators": []}
+usernames = []
+scores = []
+score_received = 0
+update_user = []
 
 socketio = SocketIO(
     app,
@@ -55,39 +59,66 @@ def on_click(data): # data is whatever arg you pass in your emit call on client
 def logging_in(data):
 
     name = data['username']
-    if str(request.sid) not in userIDs.keys():
-        userIDs[str(request.sid)] = name
-        if len(userIDs) == 1:
-            users["Player X"] = name
-        elif len(userIDs) == 2:
-            users["Player O"] = name
-        else:
-            users["Spectators"].append(name)
-        new_user = models.Person(username=data['username'], score=100)
-        db.session.add(new_user)
+    userlist = data['userlist']
+    
+    if len(userIDs) == 0:
+        db.session.query(models.Person).delete()
         db.session.commit()
     
-    print(users)
-    print(userIDs)
-    print(name)
+    #adding new user to DB if they are not there already
+    if str(request.sid) not in userIDs.keys():
+        userIDs[str(request.sid)] = name
+        new_user = models.Person(username=name, score=100)
+        db.session.add(new_user)
+        db.session.commit()
 
-    everyone = models.Person.query.all()
-    for person in everyone:
-        print(person.username)
-        print(person.score)
-    
-    socketio.emit('logging', users, room=request.sid)
-    socketio.emit('userlist', users, broadcast=True, include_self=True)
+    new_player = db.session.query(models.Person).filter_by(username=name).first()
+    new_player_name = new_player.username
+    new_player_score = new_player.score
+    new_player = [new_player_name, new_player_score]
+
+    socketio.emit('add_new_user', new_player, broadcast=True, include_self=True)
+    socketio.emit('logging', name, room=request.sid)
+    socketio.emit('userlist', userlist, broadcast=True, include_self=True)
     socketio.emit('username', name, room=request.sid)
 
+@socketio.on('gameover')
+def update_score(data):
+
+    global score_received
+    
+    if score_received < 2:
+        player = db.session.query(models.Person).filter_by(username=data["username"]).first()
+        print(player)
+        if data['iWon']:
+            player.score = player.score +1
+        else:
+            player.score = player.score -1
+        db.session.commit()
+    
+        all_scores = (db.session.query(models.Person)
+                    .order_by(models.Person.score.desc())
+                    )
+
+        score_received += 1
+        
+        if score_received == 2:
+            for each in all_scores:
+                usernames.append(each.username)
+                scores.append(each.score)
+            update_user = [usernames, scores]
+            socketio.emit('update_score', update_user, broadcast=True, include_self=True)
+        
 @socketio.on('reset')
-def reset(data): # data is whatever arg you pass in your emit call on client
-    # This emits the 'chat' event from the server to all clients except for
-    # the client that emmitted the event that triggered this function
+def reset(data):
+    global score_received
+    score_received = 0
+    usernames.clear()
+    scores.clear()
+    update_user.clear()
     socketio.emit('reset', data, broadcast=True, include_self=True)
 
 if __name__ == "__main__":
-    models.db.create_all()
     socketio.run(
         app,
         host=os.getenv('IP', '0.0.0.0'),

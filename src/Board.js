@@ -11,20 +11,20 @@ export function Board(user){
   const [myBoard, setBoard] = useState(Array(9).fill(null));
   const [isX, setTurn] = useState(true);
   const winner = calculateWinner(myBoard);
-  const isSpect = user.isSpectator;
-  const userName = user.userName;
-  const whichPlayer = user.whichPlayer;
+  const username = user.user;
   const playerX = user.playerX;
   const playerO = user.playerO;
-  let winnerName;
+  const isPlayerX = (username == playerX) ? true:false;
+  const isSpect = user.isSpect;
+  let gameover = false;
   
   function onClickSquare(index){
-    if(!winner && !myBoard[index] && !isSpect && (whichPlayer == isX)){
-      const newBoard = myBoard.slice();
-      newBoard[index] = isX ? 'X':'O'; //check whose turn it is
-      setBoard(newBoard);
-      setTurn(!isX);
-      socket.emit('tic', { index: index, myBoard: myBoard, isX: isX });
+    if(!winner && !myBoard[index] && !isSpect && (isX == isPlayerX)){
+        const newBoard = myBoard.slice();
+        newBoard[index] = isX ? 'X':'O'; //check whose turn it is
+        setBoard(newBoard);
+        setTurn(!isX);
+        socket.emit('tic', { index: index, myBoard: myBoard, isX: isX });
     }
   }
   
@@ -33,13 +33,13 @@ export function Board(user){
   }
   
   function getStatus(){
-    if(winner){ 
-      if(!isX) { winnerName = playerX; }
-      else { winnerName = playerO; }
-      return ("Winner: " + winnerName); 
-    }
-    else if(isBoardFull(myBoard)) { return ("Draw");}
-    else{ return ("Next Player: " + (isX ? "X" : "O"));}
+    let status;
+    
+    if (winner) { status = winner == "X" ? "Winner: " + playerX: "Winner: " + playerO; gameover = true;} 
+    else if(isBoardFull(myBoard)) { status = "Draw";}
+    else { status = 'Next player: ' + (isX ? 'X' : 'O'); }
+    
+    return status;
   }
   
   function isBoardFull(board){
@@ -88,8 +88,25 @@ export function Board(user){
     socket.on('reset', (data) => {
       setTurn(data.isX);
       setBoard(data.emptyBoard);
+      gameover = false;
     });
+    
   }, []);
+  
+  useEffect(() => {
+    
+    let iWon;
+    if(gameover){
+      if(winner == "X"){
+        iWon = username == playerX ? true:false; }
+      if(winner == "O"){
+        iWon = username == playerO ? true:false; }
+      
+      if(!isSpect) {socket.emit('gameover', {iWon:iWon, username:username});}
+    }
+  }, [winner]);
+  
+  
   
   return (
     <div>

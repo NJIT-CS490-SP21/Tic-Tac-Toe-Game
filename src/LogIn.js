@@ -1,14 +1,21 @@
 import { useRef } from 'react';
 import socket from "./Board.js";
+import { useState } from 'react';
 
-export function LogIn(){
+export function LogIn(props){
   
     const inputRef = useRef(null);
-    
+    const userlist = props.userlist;
+
     function userLogIn(){
       const username = inputRef.current.value;
       if(username === ""){ return;}
-      socket.emit('logging', { username: username });
+    
+      if(userlist["X"] == "") { userlist["X"] = username; }
+      else if (userlist["X"] != "" && userlist["O"] == "") { userlist["O"] = username; }
+      else { userlist["Spectators"].push(username); }
+    
+      socket.emit('logging', {userlist:userlist, username:username});
     }
     
     function logInScreen(){
