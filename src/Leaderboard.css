@@ -1,5 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
 
+.leaderboard{
+    float: left;
+}
+
+.object{
+    float:left;
+    padding: 250px 0px 30px 400px;
+    text-align: center;
+}
 
 .clickleader {
     background-color:white;

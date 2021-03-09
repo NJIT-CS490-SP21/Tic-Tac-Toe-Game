@@ -97,12 +97,16 @@ function App() {
   }, []);
   
   return (
-    <div class="container">
+    <div>
+      <div class="container">
       {renderLogIn()}
       {renderUserlist()}
       {renderBoard()}
-      {leaderboard()}
-      {renderLeaderboard()}
+      </div>
+      <div class="object">
+        {leaderboard()}
+        {renderLeaderboard()}
+      </div>
     </div>
   );
 }
