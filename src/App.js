@@ -12,8 +12,21 @@ function App() {
   const [user, setUser] = useState("");
   const [userlist, setUserlist] = useState({"X":"", "O": "", "Spectators": []});
   const [scores, setScores] = useState([]);
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState([]);
   let playerX, playerO, isSpect, spectators;
+  
+  console.log(users);
+  console.log(scores);
+  
+  const renderTable = scores.map((value, index) => {
+        const score =users[index];
+        return (
+            <tr key={index}>
+            <td>{value}</td>
+            <td>{score}</td>
+            </tr>
+        );
+    });
 
   function renderLogIn(){
     if(!isLoggedIn) {return <LogIn userlist={userlist} />;}
@@ -51,12 +64,32 @@ function App() {
   
   function renderLeaderboard(){
     if(isLoggedIn){
+      return (
+                <div>
+                    <table>
+                        <thead key="leaderboard">
+                            <tr>
+                                <th>User</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody >
+                            {renderTable}
+                        </tbody>
+                    </table>
+                </div>
+            );
+    }
+  }
+  
+  /*function renderLeaderboard(){
+    if(isLoggedIn){
       return(
         <div class="leaderboard">
           <Leaderboard scores={scores} users={users}/>
         </div>);
     }
-  }
+  }*/
   
   useEffect(() => {
     socket.on('logging', (data) => {
@@ -69,15 +102,6 @@ function App() {
     
     socket.on('username', (data) => {
       setUser(data);
-    });
-    
-    socket.on('add_new_user', (data) => {
-      let copyScores = [...scores];
-      let copyUsers = [...users];
-      copyUsers.push(data[0]);
-      copyScores.push(data[1]);
-      setScores(copyScores);
-      setUsers(copyUsers);
     });
     
     socket.on('update_score', (data) => {

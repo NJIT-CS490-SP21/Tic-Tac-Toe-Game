@@ -75,9 +75,13 @@ def logging_in(data):
     new_player = db.session.query(models.Person).filter_by(username=name).first()
     new_player_name = new_player.username
     new_player_score = new_player.score
-    new_player = [new_player_name, new_player_score]
+    
+    usernames.append(new_player_name)
+    scores.append(new_player_score)
+    
+    update_user = [usernames, scores]
 
-    socketio.emit('add_new_user', new_player, broadcast=True, include_self=True)
+    socketio.emit('update_score', update_user, broadcast=True, include_self=True)
     socketio.emit('logging', name, room=request.sid)
     socketio.emit('userlist', userlist, broadcast=True, include_self=True)
     socketio.emit('username', name, room=request.sid)
@@ -86,8 +90,10 @@ def logging_in(data):
 def update_score(data):
 
     global score_received
+    global update_user
     
     if score_received < 2:
+        
         player = db.session.query(models.Person).filter_by(username=data["username"]).first()
         print(player)
         if data['iWon']:
@@ -103,10 +109,15 @@ def update_score(data):
         score_received += 1
         
         if score_received == 2:
+            usernames.clear()
+            scores.clear()
+            update_user.clear()
             for each in all_scores:
                 usernames.append(each.username)
                 scores.append(each.score)
             update_user = [usernames, scores]
+        
+            print(update_user)
             socketio.emit('update_score', update_user, broadcast=True, include_self=True)
         
 @socketio.on('reset')
