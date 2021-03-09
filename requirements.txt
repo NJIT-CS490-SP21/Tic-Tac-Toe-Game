@@ -5,4 +5,3 @@ requests
 Flask-SQLAlchemy
 psycopg2
 SQLAlchemy
-python-dotenv

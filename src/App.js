@@ -100,8 +100,10 @@ function App() {
     <div>
       <div class="container">
       {renderLogIn()}
-      {renderUserlist()}
-      {renderBoard()}
+        <div class="inside">
+        {renderUserlist()}
+        {renderBoard()}
+        </div>
       </div>
       <div class="object">
         {leaderboard()}
