@@ -20,6 +20,9 @@
 	text-align:center;
 	color: #242526;
 	font-family: 'DotGothic16', sans-serif;
+	float:right;
+	padding: 5px 525px 5px 0px;
+	
 }
 
 .users > h3 {
