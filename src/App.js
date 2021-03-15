@@ -20,7 +20,7 @@ export default function App() {
 
   function renderLogIn() {
     if (!isLoggedIn) {
-      return <LogIn userlist={userlist} />;
+      return <LogIn />;
     }
     return;
   }

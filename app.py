@@ -38,24 +38,19 @@ def players_from_db():
             )
            
     return all_players
-            
-def collect_usernames(all_players_info):
     
+def list_player_info(all_players_info):
+    scores = []
     usernames = []
- 
+    update_user = []
+    
     for each in all_players_info:
         usernames.append(each.username)
-
-    return usernames
-    
-def collect_scores(all_players_info):
-    
-    scores = []
- 
-    for each in all_players_info:
         scores.append(each.score)
-
-    return scores
+        
+    update_user = [usernames, scores]
+    
+    return update_user
     
 def update_db_score(username, win_status):
     player = db.session.query(models.Person).filter_by(username=username).first()
@@ -83,7 +78,13 @@ def add_user(username, userlist):
         userlist['Spectators'].append(username)
     
     return userlist
-
+    
+def check_winner(winner, playerX, username):
+    if winner == "X":
+        return username == playerX
+    else:
+        return username != playerX
+        
 # When a client connects from this Socket connection, this function is run
 @socketio.on('connect')
 def on_connect():
@@ -111,10 +112,6 @@ def logging_in(data):
 
     name = data['username']
     userlist = add_user(data['username'], userlist)
-    
-    update_user = []
-    users = []
-    scores = []
 
     exists = check_if_exists(name) #checks for username in the database
     
@@ -123,10 +120,7 @@ def logging_in(data):
         add_user_to_db(name)
     
     all_players_info = players_from_db() #fetch from database all the players
-    users = collect_usernames(all_players_info) #makes score and username lists to be sent to all clients
-    scores = collect_scores(all_players_info)
-    
-    update_user = [users, scores]
+    update_user = list_player_info(all_players_info)
 
     socketio.emit('update_score', update_user, broadcast=True, include_self=True)
     socketio.emit('logging', name, room=request.sid)
@@ -138,7 +132,8 @@ def update_score(data):
     global score_received
     if score_received < 2: #Player X and Player O each allowed to send info once 
         
-        update_db_score(data["username"], data["iWon"]) #checks for win status and updates score
+        isWinner = check_winner(data["winner"], data["playerX"], data["username"])
+        update_db_score(data["username"], isWinner) #checks for win status and updates score
         score_received += 1
         
         if score_received == 2: #either Player X or Player O, only done once

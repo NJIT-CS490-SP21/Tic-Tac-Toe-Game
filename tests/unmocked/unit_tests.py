@@ -1,45 +1,71 @@
-#UNMOCKED unit tests go here
 import unittest
 import os
 import sys
-import unittest.mock as mock
-from unittest.mock import patch
 
-LIST_INPUT = "userlist"
-USER_INPUT = "username"
-USER_SCORE = "score"
+
+USERNAME_INPUT = "username"
+USERS_INPUT = 'users'
 EXPECTED_OUTPUT = "expected"
 
 sys.path.append(os.path.abspath('../../'))
-from app import collect_usernames
-from app import collect_scores
 
-class AddUserTestCase(unittest.TestCase):
-    
+from app import add_user
+
+class UpdateUserTestCase(unittest.TestCase):
     def setUp(self):
         self.success_test_params = [
-
             {
-                LIST_INPUT: [{USER_INPUT: "cknnoodle", USER_SCORE: 100}],
-                EXPECTED_OUTPUT: ["cknnoodle"],
+                USERNAME_INPUT: "cknnoodle",
+                USERS_INPUT: {
+                    'X': None,
+                    'O': None,
+                    'Spectators': [],
+                },
+                EXPECTED_OUTPUT: {
+                    'X': "cknnoodle",
+                    'O': None,
+                    'Spectators': [],
+                }
             },
-            {
-                LIST_INPUT: [
-                    {USER_INPUT: "cknnoodle", USER_SCORE: 100},
-                    {USER_INPUT: "clamchowder", USER_SCORE: 105},
-                ],
-                EXPECTED_OUTPUT: ["cknnoodle", "clamchowder"],
-            },
-        ]
         
-    def test_username_list(self):
+            {
+                USERNAME_INPUT: "clamchowder",
+                USERS_INPUT: {
+                    'X': "cknnoodle",
+                    'O': None,
+                    'Spectators': [],
+                },
+                EXPECTED_OUTPUT: {
+                    'X': "cknnoodle",
+                    'O': "clamchowder",
+                    'Spectators': [],
+                }
+                
+            },
+            
+            {
+                USERNAME_INPUT: "macncheese",
+                USERS_INPUT: {
+                    'X': "cknnoodle",
+                    'O': "clamchowder",
+                    'Spectators': [],
+                },
+                EXPECTED_OUTPUT: {
+                    'X': "cknnoodle",
+                    'O': "clamchowder",
+                    'Spectators': ["macncheese"],
+                }
+            }
+        ]
+
+    def test_add_user(self):
         for test in self.success_test_params:
-            actual_result = collect_usernames(test[LIST_INPUT])
+
+            actual_result = add_user(test[USERNAME_INPUT], test[USERS_INPUT])
             expected_result = test[EXPECTED_OUTPUT]
             
-            self.assertEqual(len(actual_result), len(expected_result))
-            self.assertEqual(actual_result, expected_result)
-            
+            self.assertEqual(actual_result['X'], expected_result['X'])
+            self.assertEqual(actual_result['O'], expected_result['O'])
 
 if __name__ == '__main__':
     unittest.main()

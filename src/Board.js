@@ -99,18 +99,8 @@ export function Board(user) {
   }, []);
 
   useEffect(() => {
-    let iWon;
-    if (gameover) {
-      if (winner == "X") {
-        iWon = username == playerX ? true : false;
-      }
-      if (winner == "O") {
-        iWon = username == playerO ? true : false;
-      }
-
-      if (!isSpect) {
-        socket.emit("gameover", { iWon: iWon, username: username });
-      }
+    if (gameover && !isSpect) {
+      socket.emit("gameover", { winner:winner, playerX:playerX , username: username });
     }
   }, [winner]);
 
