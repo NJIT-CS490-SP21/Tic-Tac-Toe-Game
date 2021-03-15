@@ -1,41 +1,49 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
-import { Board } from './Board.js';
-import { LogIn } from './LogIn.js';
-import { Leaderboard } from './Leaderboard.js';
-import './Board.css';
-import './Leaderboard.css';
-import socket from "./Board.js";
+import React from "react";
+import { useState, useEffect } from "react";
+import { Board } from "./Board.js";
+import { LogIn } from "./LogIn.js";
+import { Leaderboard } from "./Leaderboard.js";
+import "./Board.css";
+import "./Leaderboard.css";
+import io from "socket.io-client";
 
-function App() {
-  
+const socket = io(); // Connects to socket connection
+export { socket };
+
+export default function App() {
   const [isLoggedIn, setLogIn] = useState(false);
   const [user, setUser] = useState("");
-  const [userlist, setUserlist] = useState({"X":"", "O": "", "Spectators": []});
+  const [userlist, setUserlist] = useState({ X: "", O: "", Spectators: [] });
   const [scores, setScores] = useState([]);
   const [users, setUsers] = useState([]);
-  const [showScore, setShow] = useState([true]);
   let playerX, playerO, isSpect, spectators;
 
-  function renderLogIn(){
-    if(!isLoggedIn) {return <LogIn userlist={userlist} />;}
+  function renderLogIn() {
+    if (!isLoggedIn) {
+      return <LogIn userlist={userlist} />;
+    }
     return;
   }
-  
-  function renderBoard(){
-    if(isLoggedIn) {
-      isSpect=userlist["Spectators"].includes(user) ? true:false;
+
+  function renderBoard() {
+    if (isLoggedIn) {
+      isSpect = userlist["Spectators"].includes(user) ? true : false;
       return (
         <div>
-          <Board user={user} playerX={playerX} playerO={playerO} isSpect={isSpect}/>
+          <Board
+            user={user}
+            playerX={playerX}
+            playerO={playerO}
+            isSpect={isSpect}
+          />
         </div>
       );
     }
     return;
   }
-  
-  function renderUserlist(){
-    if(isLoggedIn){
+
+  function renderUserlist() {
+    if (isLoggedIn) {
       playerX = userlist.X;
       playerO = userlist.O;
       spectators = userlist.Spectators;
@@ -50,67 +58,45 @@ function App() {
       );
     }
   }
-  
-  
-  function renderLeaderboard(){
-    if(isLoggedIn){
-      if(showScore){
-        return(
+
+  function renderLeaderboard() {
+    if (isLoggedIn) {
+      return (
           <div>
-            <Leaderboard scores={scores} users={users} user={user}/>
-          </div>);
-        }
-      }
-  }
-  
-  function leaderboard(){
-      if(isLoggedIn){
-        return(
-          <div>
-            <button class="clickleader" onClick={() => {onClickLeaderboard()}}>Show/Hide Leaderboard</button>
+            <Leaderboard scores={scores} users={users} user={user} />
           </div>
         );
-      }
+    }
   }
-  
-  function onClickLeaderboard(){
-    setShow(!showScore);
-  }
-  
+
   useEffect(() => {
-    socket.on('logging', (data) => {
+    socket.on("logging", (data) => {
       setLogIn(true);
-    });
-    
-    socket.on('userlist', (data) => {
-      setUserlist(data);
-    });
-    
-    socket.on('username', (data) => {
       setUser(data);
     });
-    
-    socket.on('update_score', (data) => {
+
+    socket.on("userlist", (data) => {
+      setUserlist(data);
+    });
+
+    socket.on("update_score", (data) => {
       setScores(data[0]);
       setUsers(data[1]);
     });
   }, []);
-  
+
   return (
     <div>
       <div class="container">
-      {renderLogIn()}
+        {renderLogIn()}
         <div class="inside">
-        {renderUserlist()}
-        {renderBoard()}
+          {renderUserlist()}
+          {renderBoard()}
         </div>
       </div>
       <div class="object">
-        {leaderboard()}
         {renderLeaderboard()}
       </div>
     </div>
   );
 }
-
-export default App;
