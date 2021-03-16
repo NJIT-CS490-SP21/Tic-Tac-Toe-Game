@@ -15,7 +15,7 @@ export function LogIn() {
 
   function logInScreen() {
     return (
-      <div class="login">
+      <div class="login" role="login">
         <h2>Log into Game</h2>
         <input placeholder="Enter username" ref={inputRef} type="text" />
         <button onClick={userLogIn}>Log In</button>

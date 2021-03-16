@@ -94,7 +94,7 @@ export default function App() {
           {renderBoard()}
         </div>
       </div>
-      <div class="object">
+      <div class="object" role="leaderboard">
         {renderLeaderboard()}
       </div>
     </div>

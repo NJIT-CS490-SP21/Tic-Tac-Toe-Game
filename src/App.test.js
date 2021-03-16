@@ -1,20 +1,28 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import App from "./App";
 
-test("renders log in screen", () => {
+test("Log In button and screen disappears when logged in", () => {
   const result = render(<App />);
   
-  const logInButtonElement = screen.getByText('Log In');
-  expect(logInButtonElement).toBeInTheDocument();
-
+  const logInScreenElement = screen.queryByRole('login');
+  const logInButtonElement = screen.getByText("Log In");
+  expect(logInScreenElement).toBeInTheDocument();
+  
+  const textElement = screen.getByPlaceholderText('Enter username')
+  fireEvent.change(textElement, { target: { value: 'someones username' } });
+  
   fireEvent.click(logInButtonElement);
+  expect(logInScreenElement).toBeInTheDocument();
   expect(logInButtonElement).toBeInTheDocument();
 
 });
 
-test("Check for the first click on board as X", () => {
+test("Check for board rendering when logged in", () => {
   //const wrapper = shallow(<App />);
   const result = render(<App />);
+  
+  const logInScreenElement = screen.queryByRole("login")
+  expect(logInScreenElement).toBeInTheDocument();
   
   const textElement = screen.getByPlaceholderText('Enter username')
   fireEvent.change(textElement, { target: { value: 'someones username' } });
@@ -29,7 +37,7 @@ test("Check for the first click on board as X", () => {
 });
 
 
-test("Check for correct userlist", () => {
+test("Check for leaderboard upon entrance to game", () => {
   const result = render(<App />);
   
   const textElement = screen.getByPlaceholderText('Enter username')
@@ -39,13 +47,11 @@ test("Check for correct userlist", () => {
   expect(enterButtonElement).toBeInTheDocument();
   fireEvent.click(enterButtonElement);
   
-  const playerXElement = screen.getByText('X')
-  expect(PlayerXElement).toBeInTheDocument();
+  const board = screen.queryByRole('board');
+  expect(board).toBeInTheDocument();
   
-  const playerOElement = screen.getByText('O')
-  expect(PlayerOElement).toBeInTheDocument();
-  
-  const spectatorsElement = screen.getByText('Spectators')
-  expect(spectatorsElement).toBeInTheDocument();
+  const leaderboard = screen.queryByRole('leaderboard');
+  expect(leaderboard).toBeInTheDocument();
   
 });
+
