@@ -1,15 +1,25 @@
-//since displaying X or O is conditional and we
-//need to control the onClick feature conditionally, we pass it as props
-export function Square(props) {
+import React from 'react';
+
+export default function Square(props) {
+  const { click } = props.onClick;
+  const { index } = props.index;
+  const { value } = props.value;
+
   return (
     <button
-      class="square"
+      className="square"
+      type="button"
       onClick={() => {
-        props.onClick(props.index);
+        click(index);
       }}
     >
-      {" "}
-      {props.value}
+      {value}
     </button>
   );
 }
+
+Square.propTypes = {
+  index: React.propTypes.number,
+  onClick: React.propTypes.func,
+  value: React.propTypes.string,
+};

@@ -1,51 +1,52 @@
-import { useState } from "react";
+import { React, useState } from 'react';
 
-export function Leaderboard(props) {
-  const scores = props.scores;
-  const users = props.users;
-  let currUserRow = "";
+export default function Leaderboard(props) {
+  const { scores } = props;
+  const { users } = props;
+  let currUserRow = '';
   const [showScore, setShow] = useState(true);
-  
+
   const renderTable = scores.map((value, index) => {
     const score = users[index];
-    if (props.user == value) {
-      currUserRow = "curruser";
+    if (props.user === value) {
+      currUserRow = 'curruser';
     } else {
-      currUserRow = "";
+      currUserRow = '';
     }
     return (
-      <tr key={index} class={currUserRow}>
+      <tr key={index} className={currUserRow}>
         <td>{value}</td>
         <td>{score}</td>
       </tr>
     );
   });
-  
-    function leaderboardButton() {
-      return (
-        <div>
-          <button
-            class="clickleader"
-            onClick={() => {
-              onClickLeaderboard();
-            }}
-          >
-            Show/Hide Leaderboard
-          </button>
-        </div>
-      );
-  }
 
   function onClickLeaderboard() {
     setShow(!showScore);
   }
 
+  function leaderboardButton() {
+    return (
+      <div>
+        <button
+          className="clickleader"
+          type="button"
+          onClick={() => {
+            onClickLeaderboard();
+          }}
+        >
+          Show/Hide Leaderboard
+        </button>
+      </div>
+    );
+  }
+
   function leaderboard() {
-    if(showScore){
+    if (showScore) {
       return (
         <div>
           <h3>Leaderboard</h3>
-          <table class="mytable">
+          <table className="mytable">
             <thead>
               <tr>
                 <th>User</th>
@@ -57,6 +58,8 @@ export function Leaderboard(props) {
         </div>
       );
     }
+
+    return null;
   }
 
   return (
@@ -64,5 +67,5 @@ export function Leaderboard(props) {
       {leaderboardButton()}
       {leaderboard()}
     </div>
-    );
+  );
 }

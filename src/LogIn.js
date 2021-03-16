@@ -1,24 +1,24 @@
-import { useRef } from "react";
-import { socket } from "./App.js";
+import React, { useRef } from 'react';
+import { socket } from './App.js';
 
-export function LogIn() {
+export default function LogIn() {
   const inputRef = useRef(null);
 
   function userLogIn() {
     const username = inputRef.current.value;
-    if (username === "") {
+    if (username === '') {
       return;
     }
 
-    socket.emit("logging", { username: username });
+    socket.emit('logging', { username });
   }
 
   function logInScreen() {
     return (
-      <div class="login" role="login">
+      <div className="login" role="login">
         <h2>Log into Game</h2>
         <input placeholder="Enter username" ref={inputRef} type="text" />
-        <button onClick={userLogIn}>Log In</button>
+        <button type="button" onClick={userLogIn}>Log In</button>
       </div>
     );
   }
