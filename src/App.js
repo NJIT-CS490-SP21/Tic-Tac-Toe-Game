@@ -54,7 +54,7 @@ export default function App() {
         <div className="users">
           <h1>
             {user}
-            &quots Tic Tac Toe
+            's Tic Tac Toe
           </h1>
           <h2>
             Player X:

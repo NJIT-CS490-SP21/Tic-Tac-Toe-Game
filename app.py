@@ -65,7 +65,7 @@ def update_db_score(username, win_status):
         player.score = player.score + 1
     else:
         player.score = player.score - 1
-    DB.session.commit()
+    db.session.commit()
 
     return player.username, player.score
 
