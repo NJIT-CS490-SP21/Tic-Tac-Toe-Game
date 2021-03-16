@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import Board from './Board.js';

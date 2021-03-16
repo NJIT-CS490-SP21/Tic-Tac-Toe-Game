@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 
 export default function Square(props) {
@@ -17,9 +18,3 @@ export default function Square(props) {
     </button>
   );
 }
-
-Square.propTypes = {
-  index: React.propTypes.number,
-  onClick: React.propTypes.func,
-  value: React.propTypes.string,
-};

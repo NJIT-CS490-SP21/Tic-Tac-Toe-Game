@@ -16,9 +16,9 @@ APP = Flask(__name__, static_folder='./build/static')
 APP.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-DB = SQLAlchemy(APP)
+db = SQLAlchemy(APP)
 
-DB.create_all()
+db.create_all()
 
 CORS = CORS(APP, resources={r"/*": {"origins": "*"}})
 SCORE_RECEIVED = 0
@@ -38,7 +38,7 @@ def index(filename):
 
 def players_from_db():
     """ database call for all users """
-    all_players = (DB.session.query(models.Person).order_by(
+    all_players = (db.session.query(models.Person).order_by(
         models.Person.score.desc()))
     return all_players
 
@@ -60,7 +60,7 @@ def list_player_info(all_players_info):
 
 def update_db_score(username, win_status):
     """ depending on win_status, player's score is deducted or increased """
-    player = DB.session.query(
+    player = db.session.query(
         models.Person).filter_by(username=username).first()
     if win_status:
         player.score = player.score + 1
@@ -81,8 +81,8 @@ def check_if_exists(username):
 def add_user_to_db(username):
     """ add new users to database """
     new_user = models.Person(username=username, score=100)
-    DB.session.add(new_user)
-    DB.session.commit()
+    db.session.add(new_user)
+    db.session.commit()
     all_players = models.Person.query.all()
     users = []
     for player in all_players:

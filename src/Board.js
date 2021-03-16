@@ -1,3 +1,4 @@
+/* eslint-disable*/
 import { React, useState, useEffect } from 'react';
 import { socket } from './App.js';
 import Square from './Square.js';
