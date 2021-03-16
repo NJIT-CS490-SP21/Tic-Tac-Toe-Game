@@ -1,167 +1,195 @@
+"""
+this is my server python file for my Tic Tac Toe app
+"""
 import os
 from flask import Flask, send_from_directory, json, session, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv, find_dotenv
+import models
 
 load_dotenv(find_dotenv())
 
-app = Flask(__name__, static_folder='./build/static')
+APP = Flask(__name__, static_folder='./build/static')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+APP.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
-import models
-db.create_all()
+DB = SQLAlchemy(APP)
 
-cors = CORS(app, resources={r"/*": {"origins": "*"}})
-score_received = 0
-userlist = {"X": None, "O": None, "Spectators": []}
+DB.create_all()
 
-socketio = SocketIO(
-    app,
-    cors_allowed_origins="*",
-    json=json,
-    manage_session=False
-)
+CORS = CORS(APP, resources={r"/*": {"origins": "*"}})
+SCORE_RECEIVED = 0
+USERLIST = {"X": None, "O": None, "Spectators": []}
 
-@app.route('/', defaults={"filename": "index.html"})
-@app.route('/<path:filename>')
+SOCKETIO = SocketIO(APP,
+                    cors_allowed_origins="*",
+                    json=json,
+                    manage_session=False)
+
+
+@APP.route('/', defaults={"filename": "index.html"})
+@APP.route('/<path:filename>')
 def index(filename):
+    """default function"""
     return send_from_directory('./build', filename)
 
 def players_from_db():
-    all_players = (db.session.query(models.Person)
-            .order_by(models.Person.score.desc())
-            )
-           
+    """ database call for all users """
+    all_players = (DB.session.query(models.Person).order_by(
+        models.Person.score.desc()))
     return all_players
-    
+
+
 def list_player_info(all_players_info):
+    """ spits back out usernames and scores arrays """
     scores = []
     usernames = []
     update_user = []
-    
+
     for each in all_players_info:
         usernames.append(each.username)
         scores.append(each.score)
-        
+
     update_user = [usernames, scores]
-    
+
     return update_user
-    
+
+
 def update_db_score(username, win_status):
-    player = db.session.query(models.Person).filter_by(username=username).first()
+    """ depending on win_status, player's score is deducted or increased """
+    player = DB.session.query(
+        models.Person).filter_by(username=username).first()
     if win_status:
-        player.score = player.score +1
+        player.score = player.score + 1
     else:
-        player.score = player.score -1
-    db.session.commit()
-    
+        player.score = player.score - 1
+    DB.session.commit()
+
     return player.username, player.score
 
+
 def check_if_exists(username):
+    """ checks if user is already in databse """
     exists = models.Person.query.filter_by(username=username).first()
-    print(exists)
     if exists:
         return True
     return False
-    
+
 def add_user_to_db(username):
+    """ add new users to database """
     new_user = models.Person(username=username, score=100)
-    db.session.add(new_user)
-    db.session.commit()
+    DB.session.add(new_user)
+    DB.session.commit()
     all_players = models.Person.query.all()
     users = []
     for player in all_players:
         users.append(player.username)
-        
+
     return users
-    
+
+
 def add_user(username, userlist):
-    if userlist['X'] == None:
+    """ checks for existing users stored in userlist """
+    if userlist['X'] is None:
         userlist['X'] = username
-    elif userlist['O'] == None:
+    elif userlist['O'] is None:
         userlist['O'] = username
     else:
         userlist['Spectators'].append(username)
-    
+
     return userlist
-    
-def check_winner(winner, playerX, username):
+
+
+def check_winner(winner, player_x, username):
+    """ will only take in player_x username and check if it matches with curr user """
     if winner == "X":
-        return username == playerX
-    else:
-        return username != playerX
-        
-# When a client connects from this Socket connection, this function is run
-@socketio.on('connect')
+        return username == player_x
+    return username != player_x
+
+
+
+@SOCKETIO.on('connect')
 def on_connect():
-    #if request.sid not in server_ids.keys():
-    #    server_ids[request.sid] = {sid: request.sid}
+    """When a client connects from this Socket connection, this function is run"""
     print('User connected!')
-    
-# When a client disconnects from this Socket connection, this function is run
-@socketio.on('disconnect')
+
+
+@SOCKETIO.on('disconnect')
 def on_disconnect():
+    """user disconnect does not work all the time"""
     print('User disconnected!')
 
-# When a client emits the event 'chat' to the server, this function is run
-# 'chat' is a custom event name that we just decided
-@socketio.on('tic')
-def on_click(data): # data is whatever arg you pass in your emit call on client
-    # This emits the 'chat' event from the server to all clients except for
-    # the client that emmitted the event that triggered this function
-    socketio.emit('tic',  data, broadcast=True, include_self=False)
+@SOCKETIO.on('tic')
+def on_click(data):
+    """when square in board is clicked, it emits to all clients"""
+    SOCKETIO.emit('tic', data, broadcast=True, include_self=False)
 
-@socketio.on('logging')
+
+@SOCKETIO.on('logging')
 def logging_in(data):
+    """when new user logs in, userlist is updated and database is called"""
 
-    global userlist
+    global USERLIST
 
     name = data['username']
-    userlist = add_user(data['username'], userlist)
+    USERLIST = add_user(data['username'], USERLIST)
 
-    exists = check_if_exists(name) #checks for username in the database
-    
+    exists = check_if_exists(name)  #checks for username in the database
+
     #adding new user to DB if they are not there already
     if not exists:
         add_user_to_db(name)
-    
-    all_players_info = players_from_db() #fetch from database all the players
+
+    all_players_info = players_from_db()  #fetch from database all the players
     update_user = list_player_info(all_players_info)
 
-    socketio.emit('update_score', update_user, broadcast=True, include_self=True)
-    socketio.emit('logging', name, room=request.sid)
-    socketio.emit('userlist', userlist, broadcast=True, include_self=True)
+    SOCKETIO.emit('update_score',
+                  update_user,
+                  broadcast=True,
+                  include_self=True)
+    SOCKETIO.emit('logging', name, room=request.sid)
+    SOCKETIO.emit('userlist', USERLIST, broadcast=True, include_self=True)
 
-@socketio.on('gameover')
+
+@SOCKETIO.on('gameover')
 def update_score(data):
+    """when game is over, new scores are calculated and database is updated"""
 
-    global score_received
-    if score_received < 2: #Player X and Player O each allowed to send info once 
-        
-        isWinner = check_winner(data["winner"], data["playerX"], data["username"])
-        update_db_score(data["username"], isWinner) #checks for win status and updates score
-        score_received += 1
-        
-        if score_received == 2: #either Player X or Player O, only done once
-            all_players_info = players_from_db() #fetch from database all the players
-            update_user = list_player_info(all_players_info) #makes score and username lists to be sent to all clients
-            
-            socketio.emit('update_score', update_user, broadcast=True, include_self=True)
+    global SCORE_RECEIVED
+    if SCORE_RECEIVED < 2:  #Player X and Player O each allowed to send info once
 
-@socketio.on('reset')
+        is_winner = check_winner(data["winner"], data["playerX"], data["username"])
+        update_db_score(data["username"],
+                        is_winner)  #checks for win status and updates score
+        SCORE_RECEIVED += 1
+
+        if SCORE_RECEIVED == 2:  #either Player X or Player O, only done once
+            all_players_info = players_from_db(
+            )  #fetch from database all the players
+            update_user = list_player_info(
+                all_players_info
+            )  #makes score and username lists to be sent to all clients
+
+            SOCKETIO.emit('update_score',
+                          update_user,
+                          broadcast=True,
+                          include_self=True)
+
+
+@SOCKETIO.on('reset')
 def reset(data):
-    global score_received
-    score_received = 0
-    socketio.emit('reset', data, broadcast=True, include_self=True)
+    """resets win data to zero"""
+    global SCORE_RECEIVED
+    SCORE_RECEIVED = 0
+    SOCKETIO.emit('reset', data, broadcast=True, include_self=True)
+
 
 if __name__ == "__main__":
-    socketio.run(
-        app,
+    SOCKETIO.run(
+        APP,
         host=os.getenv('IP', '0.0.0.0'),
         port=8081 if os.getenv('C9_PORT') else int(os.getenv('PORT', 8081)),
     )
