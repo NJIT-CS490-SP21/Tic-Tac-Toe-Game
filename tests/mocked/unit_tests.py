@@ -4,6 +4,7 @@ from unittest.mock import patch
 import os
 import sys
 
+
 sys.path.append(os.path.abspath('../../'))
 from app import add_user_to_db
 from app import check_if_exists

@@ -7,7 +7,6 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv, find_dotenv
-import models
 
 load_dotenv(find_dotenv())
 
@@ -17,7 +16,7 @@ APP.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(APP)
-
+import models
 db.create_all()
 
 CORS = CORS(APP, resources={r"/*": {"origins": "*"}})

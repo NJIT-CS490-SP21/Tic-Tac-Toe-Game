@@ -2,7 +2,6 @@ import unittest
 import os
 import sys
 
-
 USERNAME_INPUT = "username"
 USERS_INPUT = 'users'
 EXPECTED_OUTPUT = "expected"
