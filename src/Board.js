@@ -106,7 +106,7 @@ export function Board(user) {
 
   return (
     <div>
-      <div class="board">
+      <div class="board" role="squares">
         {renderSquare(0)}
         {renderSquare(1)}
         {renderSquare(2)}

@@ -89,7 +89,7 @@ export default function App() {
     <div>
       <div class="container">
         {renderLogIn()}
-        <div class="inside">
+        <div class="inside" role="board">
           {renderUserlist()}
           {renderBoard()}
         </div>

@@ -59,15 +59,26 @@ def update_db_score(username, win_status):
     else:
         player.score = player.score -1
     db.session.commit()
+    
+    return player.username, player.score
 
 def check_if_exists(username):
-    exists = db.session.query(models.Person).filter_by(username=username).first()
-    return exists
+    exists = models.Person.query.filter_by(username=username).first()
+    print(exists)
+    if exists:
+        return True
+    return False
     
 def add_user_to_db(username):
     new_user = models.Person(username=username, score=100)
     db.session.add(new_user)
     db.session.commit()
+    all_players = models.Person.query.all()
+    users = []
+    for player in all_players:
+        users.append(player.username)
+        
+    return users
     
 def add_user(username, userlist):
     if userlist['X'] == None:
