@@ -20,7 +20,7 @@
 5. Add nodejs buildpack: heroku buildpack:add -- index 1 heroku/nodejs
 6. Push to Heroku: git push heroku milestone_1:main
 
-## Snapshots of the tictactoe app
+## Snapshots of the app
 
 Login page:
 
