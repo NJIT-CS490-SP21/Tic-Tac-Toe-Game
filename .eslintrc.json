@@ -1,0 +1,16 @@
+{
+    "extends": "airbnb", 
+    "env": {
+        "browser": true
+    },
+    "overrides":[
+    {
+        "files":["*.js"],
+        "rules":{
+            "react/no-array-index-key":"off",
+            "react/jsx-filename-extension":"off",
+            "react-hooks/exhaustive-deps": "off"
+        }
+    }
+    ]
+}

@@ -1,28 +1,28 @@
-import React from 'react';
-import { useRef } from 'react';
-import socket from "./Board.js";
+/* eslint-disable */
+import React, { useRef } from 'react';
+import { socket } from './App.js';
 
-export function LogIn(){
-  
-    const inputRef = useRef(null);
-    
-    function userLogIn(){
-      if(inputRef != null){
-        const userName = inputRef.current.value;
-        socket.emit('logging', { userName: userName });
-      }
+export default function LogIn() {
+  const inputRef = useRef(null);
+
+  function userLogIn() {
+    const username = inputRef.current.value;
+    if (username === '') {
+      return;
     }
-    
-    function logInScreen(){
-      return( 
-        <div class='login'>
-          <h2>Log In</h2>
-          <input ref={inputRef} type='text' />
-          <button onClick={userLogIn}>Log In</button>
-        </div>
-        );
-    }
-  
+
+    socket.emit('logging', { username });
+  }
+
+  function logInScreen() {
+    return (
+      <div className="login" role="login">
+        <h2>Log into Game</h2>
+        <input placeholder="Enter username" ref={inputRef} type="text" />
+        <button type="button" onClick={userLogIn}>Log In</button>
+      </div>
+    );
+  }
+
   return logInScreen();
-
 }

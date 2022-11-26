@@ -1,89 +1,120 @@
-import { useState, useRef, useEffect } from 'react';
-import { Board } from './Board.js';
-import { LogIn } from './LogIn.js';
+/* eslint-disable */
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
+import Board from './Board.js';
+import LogIn from './LogIn.js';
+import Leaderboard from './Leaderboard.js';
 import './Board.css';
-import React from 'react';
-import socket from "./Board.js";
+import './Leaderboard.css';
 
-function App() {
-  
+const socket = io(); // Connects to socket connection
+export { socket };
+
+export default function App() {
   const [isLoggedIn, setLogIn] = useState(false);
-  const [userList, setUsers] = useState([]);
-  const [user, setUserName] = useState("");
-  let isSpect = isSpectator();
-  let canStartGame = (userList.length >= 2) ? true: false;
-  let playerX, playerO, whichPlayer;
+  const [user, setUser] = useState('');
+  const [userlist, setUserlist] = useState({ X: '', O: '', Spectators: [] });
+  const [scores, setScores] = useState([]);
+  const [users, setUsers] = useState([]);
+  let playerX; let playerO; let isSpect; let
+    spectators;
 
-  function renderLogIn(){
-    if(!isLoggedIn) {return <LogIn/>;}
-    return
+  function renderLogIn() {
+    if (!isLoggedIn) {
+      return <LogIn />;
+    }
+    return null;
   }
-  
-  function renderBoard(){
-    if(isLoggedIn && canStartGame) {
-      if(user === playerX){ whichPlayer = true; }
-      if(user === playerO){ whichPlayer = false;  }
+
+  function renderBoard() {
+    if (isLoggedIn) {
+      isSpect = !!userlist.Spectators.includes(user);
       return (
         <div>
-          <Board isSpectator={isSpect} userName={user} whichPlayer={whichPlayer} playerX={playerX} playerO={playerO}/>;
+          <Board
+            user={user}
+            playerX={playerX}
+            playerO={playerO}
+            isSpect={isSpect}
+          />
         </div>
-      )
+      );
     }
-    return
+
+    return null;
   }
-  
-  function renderUserList(){
-    if(isLoggedIn){
-      let length = userList.length;
-      playerX = userList[0];
-      playerO = userList[1];
-      let spectators = "";
-      if(length > 2){
-        for(var i=2; i<length;i++){ spectators = spectators + userList[i] + '\r' ; } 
-      }
+
+  function renderUserlist() {
+    if (isLoggedIn) {
+      playerX = userlist.X;
+      playerO = userlist.O;
+      spectators = userlist.Spectators;
 
       return (
-        <div class="users">
-          <h1>{user}'s Tic Tac Toe</h1>
-          <h2>Player X: {playerX}</h2>
-          <h2>Player O: {playerO}</h2>
-          <h3>Spectators: {spectators}</h3>
+        <div className="users">
+          <h1>
+            {user}
+            's Tic Tac Toe
+          </h1>
+          <h2>
+            Player X:
+            {playerX}
+          </h2>
+          <h2>
+            Player O:
+            {playerO}
+          </h2>
+          <h3>
+            Spectators:
+            {spectators}
+          </h3>
         </div>
-      )
+      );
     }
+
+    return null;
   }
-  
-  function isSpectator(){
-    let x = userList.indexOf(user);
-    if(x>1) { return true;}
-    return false;
+
+  function renderLeaderboard() {
+    if (isLoggedIn) {
+      return (
+        <div>
+          <Leaderboard scores={scores} users={users} user={user} />
+        </div>
+      );
+    }
+
+    return null;
   }
-  
+
   useEffect(() => {
     socket.on('logging', (data) => {
       setLogIn(true);
+      setUser(data);
     });
-  }, []);
-  
-  useEffect(() => {
-    socket.on('userlist', (data) => {
-      setUsers(data);
-    });
-  }, []);
-  
-  useEffect(() => {
-    socket.on('username', (data) => {
-      setUserName(data);
-    });
-  }, []);
-  
-    return (
-      <div class="container">
-        {renderLogIn()}
-        {renderUserList()}
-        {renderBoard()}
-      </div>
-    );
-}
 
-export default App;
+    socket.on('userlist', (data) => {
+      setUserlist(data);
+    });
+
+    socket.on('update_score', (data) => {
+      setScores(data[0]);
+      setUsers(data[1]);
+    });
+  }, []);
+
+  return (
+    <div>
+      <div className="container">
+        {renderLogIn()}
+        <div className="inside" role="board">
+          {renderUserlist()}
+          {renderBoard()}
+        </div>
+      </div>
+      <div className="object" role="leaderboard">
+        {renderLeaderboard()}
+      </div>
+    </div>
+  );
+}
