@@ -2,7 +2,3 @@ Flask
 Flask-SocketIO
 Flask-Cors
 requests
-Flask-SQLAlchemy
-psycopg2
-SQLAlchemy
-python-dotenv

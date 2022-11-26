@@ -1,8 +1,0 @@
-[MESSAGES CONTROL]
-
-disable=
-    no-member,
-    wrong-import-position,
-    invalid-evvar-default,
-    global-statement
-    
